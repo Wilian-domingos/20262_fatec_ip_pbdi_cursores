@@ -30,3 +30,34 @@ begin
 
 end;
 $$
+
+
+--cursor nao vinculado de query dinamica
+--exibindo nomes de youtuber que começaram a partir de um ano especifico
+
+
+DO $$
+DECLARE
+--DECLARAR AS VARIAVEIS
+	cur_nomes_a_partir_de REFCURSOR;
+	v_youtuber VARCHAR (200);
+	v_ano int:=2008;
+	v_nome_tabela VARCHAR(200):='tb_top_youtubers';
+BEGIN
+-- ABERTURA DO CURSOR
+	OPEN cur_nomes_a_partir_de FOR EXECUTE 
+	format ('
+	SELECT youtuber FROM %s WHERE started >= $1',
+	v_nome_tabela	
+	)
+	USING v_ano;
+	 LOOP
+		FETCH cur_nomes_a_partir_de INTO v_youtuber;
+		EXIT WHEN NOT FOUND;
+		RAISE NOTICE '%', v_youtuber;
+	END LOOP;
+	--ENCERRAR O CURSOR
+	CLOSE cur_nomes_a_partir_de;
+
+END;
+$$
